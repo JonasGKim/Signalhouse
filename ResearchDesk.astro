@@ -1,0 +1,9 @@
+---
+import ResearchTable from './ResearchTable.astro';
+import type { ResearchEntry } from '../../../data/research';
+interface Props { entries: ResearchEntry[]; }
+const { entries } = Astro.props;
+---
+<section class="research-desk" aria-label="Research notebook, newest first">
+  <ResearchTable entries={entries} />
+</section>

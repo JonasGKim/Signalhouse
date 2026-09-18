@@ -1,0 +1,61 @@
+---
+import type { Project } from '../../data/projects';
+interface Props {
+  kind: Project['id'];
+}
+const { kind } = Astro.props;
+---
+
+<div class:list={['project-motif', `motif-${kind}`]} aria-hidden="true">
+  {
+    kind === 'hypocenter' && (
+      <svg viewBox="0 0 160 72" fill="none">
+        <>
+          <path d="M0 36h160M80 0v72" stroke="currentColor" opacity=".18" />
+          <path
+            d="M2 42h26l8-5 10 8 12-25 12 35 10-42 10 31 8-8h22l8-6 9 8h19"
+            stroke="currentColor"
+            stroke-width="1.3"
+          />
+          <circle cx="80" cy="13" r="3" fill="currentColor" />
+        </>
+      </svg>
+    )
+  }
+  {
+    kind === 'nfa' && (
+      <div class="ticker-motif">
+        <>
+          <span class="mono">TICKER</span>
+          <span class="thesis-directions">
+            <i /> ↘
+          </span>
+        </>
+      </div>
+    )
+  }
+  {
+    kind === 'expectations' && (
+      <div class="matrix-motif">
+        {Array.from({ length: 24 }, (_, i) => (
+          <span
+            style={`opacity:${0.09 + ((i % 6) + Math.floor(i / 6)) * 0.055}`}
+          />
+        ))}
+      </div>
+    )
+  }
+  {
+    kind === 'filings' && (
+      <div class="diff-motif">
+        <>
+          <span />
+          <span />
+          <span class="diff-add" />
+          <span />
+          <span class="diff-remove" />
+        </>
+      </div>
+    )
+  }
+</div>

@@ -1,0 +1,21 @@
+---
+import type { ResearchEntry } from '../../../data/research';
+import { formatResearchDate } from '../../../lib/formatting';
+interface Props {
+  entry: ResearchEntry;
+}
+const { entry } = Astro.props;
+---
+
+<section class="research-entry">
+  <div class="entry-metadata">
+    <span class="mono muted"
+      >{entry.categories.join(' · ')}</span
+    ><time class="mono" datetime={entry.publishedAt}
+      >{formatResearchDate(entry.publishedAt)}</time>
+  </div>
+  <h2 class="history-title">
+    <a href={`/research/notes/${entry.id}/`}>{entry.title}</a>
+  </h2>
+  {entry.notes && entry.notes.trim() !== entry.thesis.trim() && <p class="note-excerpt">{entry.notes}</p>}
+</section>

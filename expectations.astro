@@ -1,0 +1,20 @@
+---
+import SourceNote from '../../components/ui/SourceNote.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeading from '../../components/ui/PageHeading.astro';
+import ExpectationsShell from '../../components/projects/expectations/ExpectationsShell.astro';
+---
+
+<BaseLayout title="Expectations model"
+  ><div class="container page-content">
+    <a class="text-link breadcrumb" href="/valuation/">← Valuation overview</a
+    ><PageHeading
+      number="03"
+      category="Model workspace"
+      title="Expectations"
+      description="Explore growth implied by an enterprise value, with explicit assumptions and a sensitivity matrix."
+      status="Scenario calculator"
+    /><ExpectationsShell />
+    <SourceNote id="expectations" />
+  </div></BaseLayout
+>

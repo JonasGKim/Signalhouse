@@ -1,0 +1,44 @@
+---
+import NotebookScene from './NotebookScene.astro';
+interface Props {
+  researchCount: number;
+  researchAvailable: boolean;
+}
+const { researchCount, researchAvailable } = Astro.props;
+---
+
+<section class="notebook-hero container" aria-labelledby="hero-title">
+  <div class="notebook-copy">
+    <p class="eyebrow">
+      <span class="square"></span> A personal investing notebook
+    </p>
+    <h1 id="hero-title">
+      A little curiosity.<br />A lot of <em>homework.</em>
+    </h1>
+    <p class="notebook-intro">
+      I research companies, question my assumptions, and keep the receipts. This
+      is where I share what I’m learning—and what I own.
+    </p>
+    <div class="hero-actions">
+      <a class="button button-primary" href="/research/"
+        >Read the notebook <span aria-hidden="true">↗</span></a
+      ><a class="text-link" href="#portfolio"
+        >See my positions <span aria-hidden="true">↓</span></a
+      >
+    </div>
+    <p class="notebook-disclaimer">
+      My process, in public. Not financial advice.
+    </p>
+  </div>
+  <NotebookScene />
+  <div class="notebook-bottom">
+    <span>Independent thinking. An open notebook.</span><span
+      >{
+        researchAvailable
+          ? `${researchCount} research entries`
+          : 'Research, tools & a real portfolio'
+      }
+      <span aria-hidden="true">↘</span></span
+    >
+  </div>
+</section>

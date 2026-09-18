@@ -1,0 +1,86 @@
+---
+import Wordmark from './Wordmark.astro';
+const links = [
+  { href: '/#tools', label: 'Tools' },
+  { href: '/research/', label: 'Research' },
+  { href: '/#portfolio', label: 'Portfolio' },
+  { href: '/methodology/', label: 'Methodology' },
+  { href: '/about/', label: 'About' },
+];
+const active = (href: string) => Astro.url.pathname.startsWith(href);
+---
+
+<header class="site-header">
+  <div class="container header-inner">
+    <Wordmark />
+    <nav class="desktop-nav" aria-label="Main navigation">
+      {
+        links.map((link) => (
+          <a
+            href={link.href}
+            aria-current={active(link.href) ? 'page' : undefined}
+          >
+            {link.label}
+          </a>
+        ))
+      }
+    </nav>
+    <details class="mobile-menu">
+      <summary
+        >Menu <span class="menu-symbol" aria-hidden="true"></span></summary
+      >
+      <nav aria-label="Mobile navigation">
+        <div class="mobile-primary">
+          {
+            links.map((link) => (
+              <a
+                href={link.href}
+                aria-current={active(link.href) ? 'page' : undefined}
+              >
+                {link.label}
+              </a>
+            ))
+          }
+        </div>
+        <div class="mobile-workspaces" role="group" aria-label="Workspaces">
+          <span class="mobile-group-label">Workspaces</span>
+          {
+            [
+              { href: '/macro/', label: 'Hypocenter' },
+              { href: '/valuation/', label: 'Expectations' },
+              { href: '/filings/', label: 'Filings' },
+            ].map((link) => (
+              <a
+                href={link.href}
+                aria-current={active(link.href) ? 'page' : undefined}
+              >
+                {link.label}
+              </a>
+            ))
+          }
+        </div>
+      </nav>
+    </details>
+  </div>
+</header>
+<script>
+  const menu = document.querySelector<HTMLDetailsElement>('.mobile-menu');
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && menu?.open) {
+      menu.open = false;
+      menu.querySelector('summary')?.focus();
+    }
+  });
+  menu?.querySelector('nav')?.addEventListener('click', (event) => {
+    if (event.target instanceof Element && event.target.closest('a'))
+      menu.open = false;
+  });
+  document.addEventListener('click', (event) => {
+    if (
+      menu?.open &&
+      event.target instanceof Node &&
+      !menu.contains(event.target)
+    )
+      menu.open = false;
+  });
+</script>

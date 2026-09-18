@@ -1,0 +1,252 @@
+---
+import { holdings } from '../../data/portfolio';
+const money = (value: number) =>
+  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
+    value,
+  );
+let offset = 0;
+const arcs = holdings.map((h) => {
+  const arc = { ...h, offset };
+  offset += h.weight;
+  return arc;
+});
+---
+
+<section
+  class="portfolio-section container"
+  id="portfolio"
+  aria-labelledby="portfolio-title"
+>
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">Skin in the game / 01</p><h2 id="portfolio-title">
+        The portfolio, <em>with the margins open.</em>
+      </h2>
+    </div><p class="section-aside">
+      What I own.<br />Always a work in progress.
+    </p>
+  </div>
+  <div class="portfolio-layout">
+    <div class="allocation-card">
+      <p class="eyebrow">The current mix</p>
+      <div class="allocation-chart">
+        <svg viewBox="0 0 240 240" role="img" aria-labelledby="allocation-title"
+          ><title id="allocation-title">
+            Approximate portfolio allocation. Select a position below to
+            explore.
+          </title>
+          {
+            arcs.map((h) => (
+              <circle
+                cx="120"
+                cy="120"
+                r="89"
+                pathLength="100"
+                fill="none"
+                stroke={h.color}
+                stroke-width="30"
+                stroke-dasharray={`${Math.max(h.weight - 0.65, 0.2)} ${100 - Math.max(h.weight - 0.65, 0.2)}`}
+                stroke-dashoffset={-h.offset}
+                transform="rotate(-90 120 120)"
+              />
+            ))
+          }
+        </svg>
+        <div class="allocation-center">
+          <strong>8</strong><span>open positions</span>
+        </div>
+      </div>
+      <p class="allocation-caption">
+        A snapshot of conviction.<br />Weights are approximate and rounded.
+      </p>
+      <div class="portfolio-legend">
+        {
+          holdings.map((h) => (
+            <button
+              type="button"
+              data-holding={h.ticker}
+              aria-controls={`position-${h.ticker}`}
+              aria-pressed={h.ticker === 'CRDO'}
+            >
+              <>
+                <i style={`--holding-color:${h.color}`} />
+                <span>{h.ticker}</span>
+                <span>{h.weight}%</span>
+              </>
+            </button>
+          ))
+        }
+      </div>
+    </div>
+    <div class="positions-card">
+      <div class="positions-heading">
+        <span>Company</span><span>Avg. entry / share</span><span>Weight</span>
+      </div>
+      <div class="positions-list">
+        {
+          holdings.map((h) => (
+            <button
+              class="position-row"
+              type="button"
+              data-holding={h.ticker}
+              aria-controls={`position-${h.ticker}`}
+              aria-pressed={h.ticker === 'CRDO'}
+            >
+              <>
+                <span class="position-company">
+                  <>
+                    <i style={`--holding-color:${h.color}`} />
+                    <span>
+                      <>
+                        <strong>{h.ticker}</strong>
+                        <small>{h.name}</small>
+                      </>
+                    </span>
+                  </>
+                </span>
+                <span>{money(h.entry)}</span>
+                <span>
+                  {h.weight}% <span aria-hidden="true">↗</span>
+                </span>
+              </>
+            </button>
+          ))
+        }
+      </div>
+      <p class="portfolio-source">
+        Holdings from an owner-provided snapshot. Prices in USD. Not a live
+        brokerage feed.
+      </p>
+    </div>
+  </div>
+  <div class="position-details" aria-live="polite">
+    {
+      holdings.map((h) => (
+        <article
+          id={`position-${h.ticker}`}
+          data-position={h.ticker}
+          hidden={h.ticker !== 'CRDO'}
+        >
+          <div class="detail-title">
+            <>
+              <div>
+                <>
+                  <p class="eyebrow">Inside the position / {h.sector}</p>
+                  <h3>
+                    {h.name} <span>{h.ticker}</span>
+                  </h3>
+                </>
+              </div>
+              <span class="holding-tag">Held in the notebook</span>
+            </>
+          </div>
+          <div class="position-metrics">
+            <>
+              <div>
+                <>
+                  <span>Average entry / share</span>
+                  <strong>{money(h.entry)}</strong>
+                </>
+              </div>
+              <div>
+                <>
+                  <span>Snapshot price / share</span>
+                  <strong>{money(h.snapshot)}</strong>
+                </>
+              </div>
+              <div>
+                <>
+                  <span>Latest market quote</span>
+                  <strong data-quote-price>Not connected</strong>
+                </>
+              </div>
+            </>
+          </div>
+          <>
+            <div class="position-note">
+              <>
+                <p>
+                  The average entry above comes from the portfolio snapshot.
+                </p>
+                <button
+                  class="text-link quote-button"
+                  type="button"
+                  data-quote={h.ticker}
+                >
+                  Check latest quote ↗
+                </button>
+              </>
+            </div>
+            <p class="quote-status" data-quote-status role="status">
+              Snapshot prices are historical reference values, not current
+              quotes.
+            </p>
+          </>
+        </article>
+      ))
+    }
+  </div>
+  <p class="portfolio-footnote">
+    This is not a complete picture of my holdings. It shows one account only;
+    retirement accounts, including a Roth IRA, are not included. Positions can
+    change. This is a personal investing journal, not a recommendation to buy or
+    sell.
+  </p>
+</section>
+<script>
+  document
+    .querySelectorAll<HTMLButtonElement>('[data-holding]')
+    .forEach((button) =>
+      button.addEventListener('click', () => {
+        const ticker = button.dataset.holding;
+        const selected = document.getElementById(`position-${ticker}`);
+        document
+          .querySelectorAll<HTMLElement>('[data-position]')
+          .forEach(
+            (panel) => (panel.hidden = panel.dataset.position !== ticker),
+          );
+        document
+          .querySelectorAll<HTMLButtonElement>('[data-holding]')
+          .forEach((control) =>
+            control.setAttribute(
+              'aria-pressed',
+              String(control.dataset.holding === ticker),
+            ),
+          );
+        selected?.scrollIntoView({ block: 'nearest', behavior: 'instant' });
+      }),
+    );
+  document
+    .querySelectorAll<HTMLButtonElement>('[data-quote]')
+    .forEach((button) =>
+      button.addEventListener('click', async () => {
+        const panel = button.closest('article')!;
+        const status = panel.querySelector<HTMLElement>('[data-quote-status]')!;
+        button.disabled = true;
+        status.textContent = 'Checking the latest available market quote…';
+        try {
+          const response = await fetch(
+            `/api/portfolio-quote/?ticker=${encodeURIComponent(button.dataset.quote!)}`,
+          );
+          const data = await response.json();
+          if (!response.ok)
+            throw new Error(
+              data.error || 'Market quotes are temporarily unavailable.',
+            );
+          panel.querySelector<HTMLElement>('[data-quote-price]')!.textContent =
+            new Intl.NumberFormat('en-US', {
+              style: 'currency',
+              currency: 'USD',
+            }).format(data.price);
+          status.textContent = `Alpha Vantage · Trading date ${data.date} · End-of-day quote; not real-time. Allocation remains the original snapshot.`;
+        } catch (error) {
+          status.textContent =
+            error instanceof Error
+              ? error.message
+              : 'Market quotes are temporarily unavailable.';
+        } finally {
+          button.disabled = false;
+        }
+      }),
+    );
+</script>

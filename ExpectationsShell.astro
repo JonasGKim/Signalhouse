@@ -1,0 +1,209 @@
+---
+const fields = [
+  {
+    name: 'enterpriseValue',
+    label: 'Enterprise value',
+    value: 2000,
+    min: 0.01,
+    max: 1e12,
+    step: 'any',
+  },
+  {
+    name: 'revenue',
+    label: 'Annual revenue',
+    value: 1000,
+    min: 0.01,
+    max: 1e12,
+    step: 'any',
+  },
+  {
+    name: 'forecastYears',
+    label: 'Forecast period · years',
+    value: 10,
+    min: 1,
+    max: 30,
+    step: '1',
+  },
+  {
+    name: 'operatingMargin',
+    label: 'Operating margin · %',
+    value: 20,
+    min: 0.01,
+    max: 100,
+    step: 'any',
+  },
+  {
+    name: 'taxRate',
+    label: 'Cash tax rate · %',
+    value: 25,
+    min: 0,
+    max: 99.99,
+    step: 'any',
+  },
+  {
+    name: 'reinvestmentRate',
+    label: 'Reinvestment / after-tax profit · %',
+    value: 25,
+    min: 0,
+    max: 99.99,
+    step: 'any',
+  },
+  {
+    name: 'discountRate',
+    label: 'Discount rate (WACC) · %',
+    value: 10,
+    min: 0.01,
+    max: 50,
+    step: 'any',
+  },
+  {
+    name: 'terminalGrowthRate',
+    label: 'Terminal growth · %',
+    value: 2.5,
+    min: 0,
+    max: 49.99,
+    step: 'any',
+  },
+];
+---
+
+<section
+  class="expectations-shell tool-workspace"
+  aria-label="Reverse valuation model"
+>
+  <div class="workspace-heading">
+    <h2>The expectations model</h2><span
+      class="mono muted"
+      id="model-provenance">ILLUSTRATIVE INPUTS</span>
+  </div>
+  <div class="model-layout">
+    <form id="valuation-form" class="model-inputs">
+      <p class="eyebrow">01 / Inputs & assumptions</p>
+      <p class="tool-help">
+        Use the same currency and unit for both amounts, for example USD
+        millions. No market prices are fetched.
+      </p>
+      <fieldset>
+        <legend class="sr-only">Valuation assumptions</legend>{
+          fields.map((field) => (
+            <label>
+              {field.label}
+              <input
+                name={field.name}
+                type="number"
+                value={field.value}
+                min={field.min}
+                max={field.max}
+                step={field.step}
+                required
+                inputmode="decimal"
+              />
+            </label>
+          ))
+        }
+      </fieldset>
+      <div class="tool-actions">
+        <button type="submit" class="button button-primary"
+          >Calculate growth</button
+        ><button type="reset" class="text-link">Reset example</button>
+      </div>
+      <p class="tool-help">
+        The starting values are a fictional example. Replace them with your
+        research.
+      </p>
+    </form>
+    <div class="model-output">
+      <div class="workspace-heading">
+        <h3>Implied expectations</h3><span class="mono muted"
+          >02 / RESULTS</span>
+      </div>
+      <p
+        id="model-message"
+        class="tool-message"
+        role="status"
+        aria-live="polite"
+      >
+        Calculate to see the revenue growth required by these assumptions.
+      </p>
+      <div id="model-results" hidden>
+        <div class="model-answer">
+          <p class="eyebrow">Implied annual revenue growth</p><strong
+            id="implied-growth">—</strong
+          ><p id="growth-context" class="tool-help"></p>
+        </div>
+        <dl class="implied-metrics">
+          <div>
+            <dt>Revenue in final forecast year</dt><dd id="final-revenue">—</dd>
+          </div><div>
+            <dt>Value from terminal cash flows</dt><dd id="terminal-share">
+              —
+            </dd>
+          </div>
+        </dl>
+        <section class="sensitivity">
+          <div class="workspace-heading"><h3>Growth sensitivity</h3></div><p
+            class="tool-help"
+          >
+            Required annual growth at different margins and discount rates.
+            Other assumptions stay fixed. A dash means the scenario is outside
+            the model’s range.
+          </p><div class="tool-table-scroll">
+            <table id="sensitivity-results">
+              <caption>Implied growth · margin by discount rate</caption><thead
+              ></thead><tbody></tbody>
+            </table>
+          </div>
+        </section>
+        <details class="model-details">
+          <summary>Inspect annual cash flows</summary><div
+            class="tool-table-scroll"
+          >
+            <table id="cashflow-results">
+              <caption
+                >Amounts in your input unit · year-end discounting</caption
+              ><thead
+                ><tr
+                  ><th scope="col">Year</th><th scope="col">Revenue</th><th
+                    scope="col">Free cash flow</th
+                  ><th scope="col">Present value</th></tr
+                ></thead
+              ><tbody></tbody>
+            </table>
+          </div>
+        </details>
+        <button type="button" id="export-model" class="text-link"
+          >Download calculation CSV</button
+        >
+      </div>
+      <details class="model-details">
+        <summary>How this model works</summary><p>
+          After-tax operating profit = revenue × operating margin × (1 − tax
+          rate). Free cash flow = after-tax operating profit × (1 − reinvestment
+          rate). Each forecast cash flow is discounted at WACC.
+        </p><p>
+          Terminal value = final-year cash flow × (1 + terminal growth) ÷ (WACC
+          − terminal growth). The solver finds constant revenue growth that
+          makes total present value equal enterprise value.
+        </p><p>
+          Margin, tax and reinvestment remain constant, including in perpetuity.
+          This simplified scenario does not independently model capital
+          expenditure, working capital, dilution or returns on capital. Terminal
+          reinvestment must be economically consistent with your assumed growth.
+          It is unsuitable for banks, negative cash flows or changing capital
+          structures. A single price cannot identify both growth and margin:
+          margin is your assumption.
+        </p>
+      </details>
+    </div>
+  </div>
+  <noscript
+    ><p class="tool-message">
+      Enable JavaScript to calculate scenarios. The methodology above remains
+      available.
+    </p></noscript
+  >
+</section>
+<script>
+  import { initializeValuation } from '../../../scripts/valuation';
+  initializeValuation();
+</script>

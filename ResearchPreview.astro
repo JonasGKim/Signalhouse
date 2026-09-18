@@ -1,0 +1,46 @@
+---
+import ResearchTable from '../projects/nfa/ResearchTable.astro';
+import type { ResearchEntry } from '../../data/research';
+interface Props {
+  entries: ResearchEntry[];
+  available: boolean;
+}
+const { entries, available } = Astro.props;
+---
+
+<section
+  class="research-preview container"
+  id="research-preview"
+  aria-labelledby="research-title"
+>
+  <div class="research-bridge">
+    <p class="eyebrow">From observation to interpretation</p><h2>
+      Data brings the evidence.<br /><em>Research makes the case.</em>
+    </h2><p>
+      The instruments sharpen the question. The notebook gives it a point of
+      view.
+    </p>
+  </div>
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">Not Financial Advice / Latest entries</p><h2
+        id="research-title"
+      >
+        At the Research Desk.
+      </h2>
+    </div><a href="/research/" class="text-link"
+      >Explore Research Desk </a>
+  </div>
+  {
+    available ? (
+      <ResearchTable entries={entries.slice(0, 3)} />
+    ) : (
+      <p class="source-state">
+        The research source is temporarily unavailable.{' '}
+        <a class="text-link" href="/research/">
+          Open the Research Desk
+        </a>
+      </p>
+    )
+  }
+</section>

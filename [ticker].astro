@@ -1,0 +1,35 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getResearch } from '../../lib/server/notion';
+import ResearchEntryView from '../../components/projects/nfa/ResearchEntry.astro';
+const library = await getResearch();
+const ticker = (Astro.params.ticker ?? '').toUpperCase();
+const entries = library.entries.filter((e) => e.ticker === ticker);
+Astro.response.status =
+  library.status !== 'ready' ? 503 : entries.length ? 200 : 404;
+Astro.response.headers.set('Cache-Control', 'private, no-store');
+---
+
+<BaseLayout title={`${ticker} research history`}
+  ><article class="container page-content research-detail">
+    <a class="text-link" href="/research/">← Research Desk</a>
+    <div class="page-heading">
+      <p class="eyebrow">Not Financial Advice / Research history</p><h1>
+        {ticker}
+      </h1><p class="page-description">{entries[0]?.company}</p><p
+        class="mono muted"
+      >
+        {entries.length} entries · Newest first
+      </p>
+    </div>
+    {
+      library.status !== 'ready' ? (
+        <p>Research is temporarily unavailable. Please try again shortly.</p>
+      ) : entries.length ? (
+        entries.map((entry) => <ResearchEntryView entry={entry} />)
+      ) : (
+        <p>No research was found for this ticker.</p>
+      )
+    }
+  </article></BaseLayout
+>

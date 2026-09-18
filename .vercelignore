@@ -1,0 +1,11 @@
+.git
+.openai
+.dev.vars*
+.env*
+.wrangler
+node_modules
+dist
+outputs
+work
+.astro
+.DS_Store

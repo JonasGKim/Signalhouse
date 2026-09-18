@@ -1,0 +1,31 @@
+---
+interface Props {
+  number: string;
+  category: string;
+  title: string;
+  description: string;
+  status?: string;
+}
+const {
+  number,
+  category,
+  title,
+  description,
+  status = 'In development',
+} = Astro.props;
+---
+
+<div class="page-heading">
+  <div class="page-eyebrow">
+    <p class="eyebrow">
+      Signalhouse <span aria-hidden="true">/</span>
+      {number}
+      <span aria-hidden="true">/</span>
+      {category}
+    </p><span class="mono page-status"><i aria-hidden="true"></i>{status}</span>
+  </div><h1>{title}<span class="heading-dot">.</span></h1><p
+    class="page-description"
+  >
+    {description}
+  </p><slot />
+</div>

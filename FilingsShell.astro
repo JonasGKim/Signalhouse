@@ -1,0 +1,84 @@
+<section class="filings-shell tool-workspace" aria-label="Filing comparison">
+  <div class="workspace-heading">
+    <h2>Compare the language</h2><span class="mono muted">LOCAL DOCUMENTS</span>
+  </div>
+  <p class="tool-help">
+    Paste the same section from two filings, or open UTF-8 .txt files. Documents
+    stay in this browser. Line breaks define comparison units; repeated spaces
+    and blank lines are ignored.
+  </p>
+  <form id="sec-search" class="source-search">
+    <label for="sec-company">Find the originals on SEC EDGAR</label><div>
+      <input
+        id="sec-company"
+        name="company"
+        placeholder="Ticker, company name or CIK"
+        maxlength="80"
+        required
+      /><button class="button" type="submit">Open SEC search ↗</button>
+    </div>
+  </form>
+  <form id="filing-form">
+    <div class="filing-editors">
+      <div class="filing-editor"
+        ><span class="eyebrow">01 / Earlier filing</span><input
+          type="file"
+          id="earlier-file"
+          accept=".txt,text/plain"
+          aria-label="Open earlier filing text file"
+        /><textarea
+          id="earlier-text"
+          aria-label="Earlier filing text"
+          name="earlier"
+          required
+          maxlength="500000"
+          placeholder="Paste earlier disclosure text…"
+          spellcheck="false"></textarea></div
+      >
+      <div class="filing-editor"
+        ><span class="eyebrow">02 / Later filing</span><input
+          type="file"
+          id="later-file"
+          accept=".txt,text/plain"
+          aria-label="Open later filing text file"
+        /><textarea
+          id="later-text"
+          aria-label="Later filing text"
+          name="later"
+          required
+          maxlength="500000"
+          placeholder="Paste later disclosure text…"
+          spellcheck="false"></textarea></div
+      >
+    </div>
+    <div class="tool-actions">
+      <button type="submit" id="compare-filings" class="button button-primary"
+        >Compare filings</button
+      ><button type="reset" class="text-link">Clear documents</button><span
+        class="tool-help">Up to 500,000 characters each · plain text only</span>
+    </div>
+  </form>
+  <p id="filing-message" class="tool-message" role="status" aria-live="polite">
+    Add two disclosures to begin. No documents are loaded.
+  </p>
+  <section id="filing-results" hidden aria-label="Comparison results">
+    <div class="workspace-heading">
+      <h3>Changes in context</h3><label class="tool-checkbox"
+        ><input id="changes-only" type="checkbox" /> Changes only</label>
+    </div>
+    <p class="tool-help">
+      Added and removed text is labeled. A text change is not a judgment of
+      materiality. Formatting and moved passages can appear as changes.
+    </p>
+    <div id="filing-diff" class="filing-diff"></div>
+  </section>
+  <noscript
+    ><p class="tool-message">
+      Enable JavaScript to compare documents locally.
+    </p></noscript
+  >
+</section>
+<script>
+  import { initializeFilings } from '../../../scripts/filings';
+  initializeFilings();
+</script>

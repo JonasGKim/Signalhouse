@@ -1,0 +1,22 @@
+---
+import Wordmark from './Wordmark.astro';
+---
+
+<footer class="site-footer container">
+  <div class="footer-top">
+    <div>
+      <Wordmark compact /><p>Independent financial research and tools.</p>
+    </div><nav aria-label="Footer navigation">
+      <a href="/research/">Research Desk</a><a href="/macro/">Macro</a><a
+        href="/valuation/">Valuation</a
+      ><a href="/filings/">Filings</a><a href="/methodology/">Methodology</a><a
+        href="/about/">About</a
+      >
+    </nav>
+  </div>
+  <div class="footer-bottom">
+    <p>
+      For informational and educational purposes only. Not investment advice.
+    </p><span class="mono">© {new Date().getFullYear()} Signalhouse</span>
+  </div>
+</footer>

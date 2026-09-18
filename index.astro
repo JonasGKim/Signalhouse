@@ -1,0 +1,39 @@
+---
+import SourceNote from '../../components/ui/SourceNote.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeading from '../../components/ui/PageHeading.astro';
+import ExpectationsShell from '../../components/projects/expectations/ExpectationsShell.astro';
+---
+
+<BaseLayout
+  title="Expectations"
+  description="A reverse valuation model for exploring the growth and profitability implied by market prices."
+  ><div class="container page-content">
+    <PageHeading
+      number="03"
+      category="Valuation"
+      title="Expectations"
+      status="Scenario calculator"
+      description="Understand what growth, margins, and cash flows may be implied by a market valuation."
+    /><ExpectationsShell /><div class="context-columns">
+      <section>
+        <p class="eyebrow">The question behind the price</p><h2>
+          Start with expectations.
+        </h2><p>
+          A reverse valuation model begins with the market’s price and works
+          toward the business performance that could support it.
+        </p>
+      </section><section>
+        <p class="eyebrow">A model, with context</p><h2>
+          Make assumptions visible.
+        </h2><p>
+          The workspace keeps inputs, assumptions, and sensitivities together so
+          each result can be examined.
+        </p><a class="text-link section-link" href="/valuation/expectations/"
+          >Open the model
+        </a>
+      </section>
+    </div>
+    <SourceNote id="expectations" />
+  </div></BaseLayout
+>

@@ -1,0 +1,226 @@
+---
+import { getHypocenter } from '../../../lib/server/macro';
+import MarketContext from './MarketContext.astro';
+const model = await getHypocenter();
+const fmt = (v: number) =>
+  v.toLocaleString('en-US', { maximumFractionDigits: 2 });
+const regime =
+  model.score === null
+    ? 'Incomplete source coverage'
+    : model.score < 40
+      ? 'Lower modeled stress'
+      : model.score < 60
+        ? 'Elevated modeled stress'
+        : 'High modeled stress';
+const polyline = model.history
+  .map(
+    (p, i) =>
+      `${((i / Math.max(1, model.history.length - 1)) * 600).toFixed(2)},${(115 - p.value).toFixed(2)}`,
+  )
+  .join(' ');
+---
+
+<section class="hypocenter-index tool-workspace" aria-labelledby="index-title">
+  <div class="workspace-heading">
+    <h2 id="index-title">The Hypocenter index</h2><span class="mono muted"
+      >ORIGINAL MODEL / 7 INDICATORS</span
+    >
+  </div>
+  <div class="index-intro">
+    <div>
+      <p class="macro-value">
+        {model.score === null ? '—' : fmt(model.score)}<span>/ 100</span>
+      </p><p>{regime}</p>
+    </div><p class="tool-help">
+      The original Hypocenter model, now part of Signal House. Seven indicators
+      contribute up to 100 points using fixed linear thresholds. This is a
+      heuristic stress index, not a calibrated recession probability or a
+      trading signal. A higher score means more modeled stress.
+    </p>
+  </div>
+  {
+    model.score === null && (
+      <p role="status" class="tool-message">
+        The combined score is unavailable because one or more inputs are missing
+        or too old. Available contributions remain visible below.
+      </p>
+    )
+  }
+  <div class="tool-table-scroll">
+    <table>
+      <caption
+        >Latest published inputs · each source follows its own release calendar</caption
+      ><thead
+        ><tr
+          ><th scope="col">Indicator</th><th scope="col">Observation</th><th
+            scope="col">Model input</th
+          ><th scope="col">Contribution</th><th scope="col"
+            >Zero → maximum points</th
+          ></tr
+        ></thead
+      ><tbody
+        >{
+          model.rows.map((row) => (
+            <tr>
+              <>
+                <th scope="row">
+                  <a
+                    class="text-link"
+                    href={`https://fred.stlouisfed.org/series/${row.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {row.label} ↗
+                  </a>
+                </th>
+                <td>{row.date ?? 'Unavailable'}</td>
+                <td>
+                  {row.value === null
+                    ? 'Unavailable'
+                    : `${fmt(row.value)} ${row.unit}`}
+                </td>
+                <td>
+                  {row.points === null ? '—' : fmt(row.points)} / {row.weight}
+                </td>
+                <td>
+                  {fmt(row.safe)} → {fmt(row.danger)} {row.unit}
+                </td>
+              </>
+            </tr>
+          ))
+        }</tbody
+      >
+    </table>
+  </div>
+  <p class="tool-help">
+    Source weights and thresholds are retained from the original model. Missing
+    inputs withhold the total; they never count as zero. Growth inputs compare
+    the same calendar period a year earlier. <a
+      class="text-link"
+      href="/methodology/#hypocenter">Sources and limitations</a
+    >
+  </p>
+  <details class="model-details">
+    <summary>Explore the historical index</summary>
+    <p class="tool-help">
+      Reconstructed using today’s revised data and observation dates, which can
+      precede publication. This is not a point-in-time backtest. Only complete
+      months with all seven usable inputs are included; gaps can occur. The
+      chart spaces available months equally. Market context below uses an
+      independent price scale and does not imply predictive performance.
+    </p>
+    {
+      model.history.length ? (
+        <>
+          <svg
+            class="index-chart"
+            viewBox="0 0 600 130"
+            role="img"
+            aria-label={`Historical Hypocenter stress index from ${model.history[0].date} to ${model.history.at(-1)!.date}, on a zero to one hundred scale.`}
+          >
+            <>
+              <line x1="0" x2="600" y1="115" y2="115" stroke="var(--border)" />
+              <line
+                x1="0"
+                x2="600"
+                y1="55"
+                y2="55"
+                stroke="var(--border)"
+                stroke-dasharray="3 4"
+              />
+              <polyline
+                points={polyline}
+                fill="none"
+                stroke="var(--accent)"
+                stroke-width="1.5"
+                vector-effect="non-scaling-stroke"
+              />
+            </>
+          </svg>
+          <div class="chart-dates mono muted">
+            <>
+              <span>{model.history[0].date}</span>
+              <span>Dashed line: 60 / 100</span>
+              <span>{model.history.at(-1)!.date}</span>
+            </>
+          </div>
+          <div class="index-history-controls">
+            <>
+              <label for="index-month">Inspect a month</label>
+              <select id="index-month">
+                {[...model.history].reverse().map((p) => (
+                  <option
+                    value={p.date}
+                    data-score={fmt(p.value)}
+                    data-smoothed={
+                      p.smoothed === null ? 'Unavailable' : fmt(p.smoothed)
+                    }
+                  >
+                    {p.date}
+                  </option>
+                ))}
+              </select>
+              <p id="index-month-value" role="status" aria-live="polite" />
+            </>
+          </div>
+          <details class="model-details">
+            <>
+              <summary>View the last 24 available months</summary>
+              <div class="tool-table-scroll">
+                <table>
+                  <>
+                    <caption>
+                      Reconstructed index · the three-month mean requires three
+                      consecutive complete months
+                    </caption>
+                    <thead>
+                      <tr>
+                        <>
+                          <th scope="col">Month</th>
+                          <th scope="col">Index / 100</th>
+                          <th scope="col">Three-month mean</th>
+                        </>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {model.history
+                        .slice(-24)
+                        .reverse()
+                        .map((p) => (
+                          <tr>
+                            <th scope="row">{p.date}</th>
+                            <td>{fmt(p.value)}</td>
+                            <td>
+                              {p.smoothed === null ? '—' : fmt(p.smoothed)}
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </>
+                </table>
+              </div>
+            </>
+          </details>
+        </>
+      ) : (
+        <p class="tool-message">
+          No complete historical observations are available from all seven
+          sources.
+        </p>
+      )
+    }
+  </details>
+  <MarketContext />
+</section>
+<script>
+  const select = document.querySelector<HTMLSelectElement>('#index-month');
+  if (select) {
+    const update = () => {
+      const option = select.selectedOptions[0];
+      document.querySelector('#index-month-value')!.textContent =
+        `${option.value}: ${option.dataset.score} / 100 · Three-month mean: ${option.dataset.smoothed}`;
+    };
+    select.addEventListener('change', update);
+    update();
+  }
+</script>

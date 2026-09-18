@@ -1,0 +1,28 @@
+---
+import type { ResearchText } from '../../../data/research';
+interface Props {
+  items: ResearchText[];
+}
+const { items } = Astro.props;
+---
+
+{
+  items.map((item) => (
+    <span
+      class:list={{
+        'rt-bold': item.bold,
+        'rt-italic': item.italic,
+        'rt-code': item.code,
+        'rt-strike': item.strike,
+      }}
+    >
+      {item.href ? (
+        <a href={item.href} rel="noopener noreferrer">
+          {item.text}
+        </a>
+      ) : (
+        item.text
+      )}
+    </span>
+  ))
+}

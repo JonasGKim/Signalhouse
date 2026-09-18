@@ -1,0 +1,17 @@
+---
+import { projects } from '../../data/projects';
+const path = Astro.url.pathname;
+---
+
+<nav class="tool-nav container" aria-label="Research workspaces">
+  {
+    projects.map((p) => (
+      <a
+        href={p.href}
+        aria-current={path.startsWith(p.href) ? 'page' : undefined}
+      >
+        {p.id === 'nfa' ? 'Research Desk' : p.name}
+      </a>
+    ))
+  }
+</nav>

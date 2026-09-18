@@ -1,0 +1,442 @@
+/* Working surfaces extend the existing paper, ink and ruled-table vocabulary. */
+[hidden] {
+  display: none !important;
+}
+.tool-workspace .tool-help,
+.tool-workspace label,
+.tool-workspace input,
+.tool-workspace button {
+  font-size: 14px;
+}
+.tool-help {
+  color: var(--muted);
+  line-height: 1.65;
+  margin: 12px 0;
+}
+.tool-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin: 24px 0;
+}
+button.text-link {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font: inherit;
+}
+.tool-workspace button {
+  transition:
+    transform 140ms var(--ease-out),
+    background-color 140ms ease;
+}
+.tool-workspace button:active:not(:disabled) {
+  transform: scale(0.97);
+}
+.tool-workspace .workspace-heading {
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.tool-message {
+  padding: 14px 0;
+  font-size: 14px;
+  color: var(--muted);
+  min-height: 50px;
+}
+.tool-message.is-error {
+  color: var(--negative);
+}
+.tool-workspace .model-inputs input {
+  color: var(--foreground);
+  -webkit-text-fill-color: var(--foreground);
+  font-variant-numeric: tabular-nums;
+}
+.model-answer {
+  padding: 26px 0 32px;
+}
+.model-answer strong {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(64px, 8vw, 104px);
+  line-height: 1.2;
+  color: var(--accent);
+  letter-spacing: -0.05em;
+}
+.model-answer .tool-help {
+  margin: 0;
+}
+.model-details {
+  padding: 20px 0;
+  border-top: 1px solid var(--border);
+  margin-top: 24px;
+}
+.model-details summary,
+.macro-history summary {
+  font-size: 14px;
+  cursor: pointer;
+}
+.model-details p {
+  margin-top: 14px;
+  font-size: 14px;
+  color: var(--muted);
+}
+.tool-table-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+  margin: 16px 0;
+}
+.tool-table-scroll table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+.tool-table-scroll caption {
+  text-align: left;
+  color: var(--muted);
+  font-size: 12px;
+  padding: 8px 0;
+}
+.tool-table-scroll th,
+.tool-table-scroll td {
+  padding: 12px 10px;
+  text-align: right;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  font-weight: 400;
+}
+.tool-table-scroll th {
+  color: var(--muted);
+}
+.tool-table-scroll th:first-child {
+  text-align: left;
+}
+.tool-workspace .sensitivity table {
+  table-layout: auto;
+}
+.tool-workspace .sensitivity td {
+  background: transparent;
+  color: var(--foreground);
+}
+.tool-workspace .sensitivity tr:nth-child(2) td:nth-child(3) {
+  outline: none;
+  background: transparent;
+}
+.tool-workspace .sensitivity td.selected-scenario {
+  background: var(--accent-soft);
+  outline: 1px solid var(--accent);
+  outline-offset: -1px;
+  color: var(--accent);
+  font-weight: 600;
+}
+.tool-workspace .implied-metrics > div {
+  text-align: left;
+  padding-left: 0;
+}
+.tool-workspace .implied-metrics dt {
+  font-size: 14px;
+}
+.tool-workspace .implied-metrics dd {
+  color: var(--foreground);
+  font-variant-numeric: tabular-nums;
+}
+.source-search {
+  margin: 28px 0;
+}
+.source-search label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--muted);
+}
+.source-search > div {
+  display: flex;
+  gap: 12px;
+  max-width: 620px;
+}
+.source-search input {
+  min-width: 0;
+  flex: 1;
+  background: var(--surface);
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+}
+.filing-editors {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+.filing-editor {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 14px;
+}
+.filing-editor input {
+  width: 100%;
+  color: var(--muted);
+}
+.filing-editor textarea {
+  width: 100%;
+  min-height: 260px;
+  padding: 16px;
+  resize: vertical;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  font: 14px/1.7 var(--font-sans);
+  color: var(--foreground);
+  border-radius: 2px;
+}
+textarea:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.tool-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tool-checkbox input {
+  accent-color: var(--accent);
+  width: 16px;
+  height: 16px;
+}
+.filing-diff {
+  margin-top: 20px;
+}
+.diff-part {
+  padding: 18px 20px;
+  border-left: 3px solid var(--border);
+  overflow-wrap: anywhere;
+}
+.diff-part + .diff-part {
+  margin-top: 6px;
+}
+.diff-text {
+  white-space: pre-wrap;
+  font-size: 15px;
+  line-height: 1.8;
+  margin-top: 8px;
+}
+.diff-added {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.diff-removed {
+  border-color: var(--negative);
+  background: color-mix(in srgb, var(--negative) 7%, var(--background));
+}
+.diff-added .eyebrow {
+  color: var(--accent);
+}
+.diff-removed .eyebrow {
+  color: var(--negative);
+}
+.changes-only .diff-unchanged {
+  display: none;
+}
+.macro-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 64px;
+}
+.macro-series {
+  min-width: 0;
+  padding: 32px 0;
+  border-top: 1px solid var(--border);
+}
+.macro-series h3 {
+  font-size: 22px;
+  letter-spacing: -0.03em;
+  margin-top: 8px;
+}
+.macro-value {
+  font-family: var(--font-display);
+  font-size: 64px;
+  line-height: 1.2;
+  margin: 20px 0 8px;
+}
+.macro-value span {
+  display: inline-block;
+  font: 14px var(--font-sans);
+  color: var(--muted);
+  margin-left: 12px;
+}
+.macro-chart {
+  width: 100%;
+  height: 130px;
+  color: var(--accent);
+  margin-top: 24px;
+}
+.chart-dates {
+  display: flex;
+  justify-content: space-between;
+}
+.macro-history {
+  margin: 24px 0;
+}
+.macro-source {
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+@media (max-width: 900px) {
+  .macro-grid {
+    column-gap: 32px;
+  }
+  .tool-workspace .model-layout {
+    grid-template-columns: 260px minmax(0, 1fr);
+  }
+  .tool-workspace .model-inputs {
+    display: block;
+  }
+}
+@media (max-width: 640px) {
+  .tool-workspace .model-layout,
+  .filing-editors,
+  .macro-grid {
+    grid-template-columns: 1fr;
+  }
+  .tool-workspace .model-inputs {
+    padding: 20px 0;
+  }
+  .tool-workspace .model-inputs fieldset {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .tool-workspace .model-inputs label {
+    margin-top: 8px;
+  }
+  .tool-workspace .model-inputs input {
+    font-size: 16px;
+  }
+  .tool-workspace .model-output {
+    padding: 0;
+  }
+  .tool-workspace .implied-metrics {
+    gap: 12px;
+  }
+  .source-search > div {
+    flex-direction: column;
+  }
+  .filing-editor textarea {
+    min-height: 210px;
+    font-size: 16px;
+  }
+  .source-search input {
+    font-size: 16px;
+  }
+  .tool-table-scroll th,
+  .tool-table-scroll td {
+    padding: 10px 7px;
+    font-size: 12px;
+  }
+  .tool-workspace .workspace-heading h2 {
+    font-size: 24px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tool-workspace button {
+    transition: none;
+  }
+  .tool-workspace button:active:not(:disabled) {
+    transform: none;
+  }
+}
+/* Keep the first inputs and results visible without a marketing-sized heading. */
+.tool-page .page-content {
+  padding-top: 28px;
+}
+.tool-page .page-heading {
+  padding-bottom: 24px;
+}
+.tool-page .page-eyebrow {
+  margin-bottom: 18px;
+}
+.tool-page .page-heading h1 {
+  font-size: clamp(42px, 4.4vw, 60px);
+}
+.tool-page .page-description {
+  max-width: 800px;
+  margin-top: 14px;
+  font-size: 16px;
+}
+.tool-workspace .workspace-heading h2 {
+  font-family: var(--font-sans);
+  font-size: 18px;
+  letter-spacing: -0.025em;
+}
+.tool-workspace .workspace-heading h3 {
+  font-family: var(--font-sans);
+  font-size: 16px;
+}
+@media (max-width: 640px) {
+  .tool-page .page-content {
+    padding-top: 20px;
+  }
+  .tool-page .page-eyebrow {
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+}
+.hypocenter-index {
+  margin-bottom: 44px;
+  border-bottom: 1px solid var(--border);
+}
+.index-intro {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 40px;
+  align-items: center;
+}
+.index-intro .macro-value {
+  margin: 0 0 8px;
+  color: var(--accent);
+}
+.index-intro .tool-help {
+  max-width: 720px;
+}
+.index-chart {
+  width: 100%;
+  height: 200px;
+  margin-top: 20px;
+}
+.index-history-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin: 28px 0 12px;
+  font-size: 14px;
+}
+.index-history-controls select {
+  padding: 8px 12px;
+  background: var(--surface);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+}
+@media (max-width: 640px) {
+  .index-intro {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+  .index-intro .macro-value {
+    font-size: 64px;
+  }
+  .hypocenter-index .tool-table-scroll th:first-child {
+    min-width: 150px;
+  }
+}
+.market-context {
+  padding: 20px 0 28px;
+}
+.market-context h3 {
+  font-size: 18px;
+  letter-spacing: -0.02em;
+}
+.market-context select {
+  max-width: 100%;
+  min-width: 0;
+}

@@ -1,0 +1,142 @@
+---
+import type { ResearchBlock } from '../../../data/research';
+import RichText from './RichText.astro';
+interface Props {
+  blocks: ResearchBlock[];
+}
+const { blocks } = Astro.props;
+const groups: ResearchBlock[][] = [];
+for (const block of blocks) {
+  const previous = groups.at(-1);
+  if (
+    previous &&
+    ['bulleted_list_item', 'numbered_list_item'].includes(block.type) &&
+    previous[0].type === block.type
+  )
+    previous.push(block);
+  else groups.push([block]);
+}
+---
+
+{
+  groups.map((group) => {
+    const block = group[0];
+    return ['bulleted_list_item', 'numbered_list_item'].includes(block.type) ? (
+      block.type === 'bulleted_list_item' ? (
+        <ul>
+          {group.map((b) => (
+            <li>
+              <RichText items={b.text} />
+              <Astro.self blocks={b.children} />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <ol>
+          {group.map((b) => (
+            <li>
+              <RichText items={b.text} />
+              <Astro.self blocks={b.children} />
+            </li>
+          ))}
+        </ol>
+      )
+    ) : (
+      <Fragment>
+        {block.type === 'paragraph' && (
+          <p>
+            <RichText items={block.text} />
+          </p>
+        )}
+        {block.type === 'heading_1' && (
+          <h2>
+            <RichText items={block.text} />
+          </h2>
+        )}
+        {block.type === 'heading_2' && (
+          <h3>
+            <RichText items={block.text} />
+          </h3>
+        )}
+        {block.type === 'heading_3' && (
+          <h4>
+            <RichText items={block.text} />
+          </h4>
+        )}
+        {['quote', 'callout'].includes(block.type) && (
+          <blockquote>
+            <RichText items={block.text} />
+          </blockquote>
+        )}
+        {block.type === 'code' && (
+          <pre>
+            <code>{block.text.map((t) => t.text).join('')}</code>
+          </pre>
+        )}
+        {block.type === 'divider' && <hr />}
+        {block.type === 'to_do' && (
+          <p>
+            <span aria-label={block.checked ? 'Complete' : 'Incomplete'}>
+              {block.checked ? '☑' : '☐'}
+            </span>{' '}
+            <RichText items={block.text} />
+          </p>
+        )}
+        {block.type === 'image' && block.url && (
+          <figure>
+            <img
+              src={block.url}
+              alt={block.caption || 'Research attachment'}
+              loading="lazy"
+              decoding="async"
+            />
+            <figcaption>{block.caption}</figcaption>
+          </figure>
+        )}
+        {[
+          'bookmark',
+          'link_preview',
+          'file',
+          'pdf',
+          'video',
+          'embed',
+          'audio',
+        ].includes(block.type) &&
+          block.url && (
+            <p>
+              <a href={block.url} rel="noopener noreferrer">
+                {block.caption || 'Open source attachment'}
+              </a>
+            </p>
+          )}
+        {block.type === 'table' && (
+          <div class="reading-table">
+            <table>
+              <tbody>
+                {block.children.map((row) => (
+                  <tr>
+                    {row.cells?.map((cell) => (
+                      <td>
+                        <RichText items={cell} />
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+        {block.type === 'toggle' ? (
+          <details>
+            <summary>
+              <RichText items={block.text} />
+            </summary>
+            <Astro.self blocks={block.children} />
+          </details>
+        ) : (
+          block.type !== 'table' && <Astro.self blocks={block.children} />
+        )}
+      </Fragment>
+    );
+  })
+}

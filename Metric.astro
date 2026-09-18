@@ -1,0 +1,16 @@
+---
+interface Props {
+  label: string;
+  value?: string;
+  note?: string;
+}
+const { label, value = '—', note = 'Not connected' } = Astro.props;
+---
+
+<div class="metric">
+  <dt>{label}</dt><dd class="metric-value mono">{value}</dd><dd
+    class="metric-note mono"
+  >
+    {note}
+  </dd>
+</div>

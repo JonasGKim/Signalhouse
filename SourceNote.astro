@@ -1,0 +1,14 @@
+---
+import { methodology } from '../../data/methodology';
+interface Props {
+  id: string;
+}
+const item = methodology.find((item) => item.id === Astro.props.id)!;
+---
+
+<aside class="source-note" aria-label="Data source and methodology">
+  <div><p class="eyebrow">Source & coverage</p><p>{item.source}</p></div><div>
+    <p class="eyebrow">Last updated</p><p>{item.updated}</p>
+  </div><a class="text-link" href={`/methodology/#${item.id}`}
+    >Methodology & limitations</a>
+</aside>

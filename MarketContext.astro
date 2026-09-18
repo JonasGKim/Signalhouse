@@ -1,0 +1,167 @@
+---
+import { assets } from '../../../lib/macro/market';
+---
+
+<section class="market-context" aria-labelledby="market-context-title">
+  <h3 id="market-context-title">Market context</h3>
+  <p class="tool-help">
+    Inspect a broad-market or sector ETF alongside the historical macro index.
+    Returns are rebased to 100 at the first available observation in the
+    selected period. This comparison does not establish causation or a trading
+    strategy.
+  </p>
+  <form id="market-history-form" class="index-history-controls">
+    <label for="market-asset">Asset</label><select
+      id="market-asset"
+      name="ticker"
+      >{
+        assets.map(([ticker, label]) => (
+          <option value={ticker}>
+            {ticker} · {label}
+          </option>
+        ))
+      }</select
+    ><label for="market-range">History</label><select id="market-range"
+      ><option value="60">5 years</option><option value="12">1 year</option
+      ><option value="240">20 years</option></select
+    ><button class="button" type="submit">Load market history</button>
+  </form>
+  <p
+    id="market-history-message"
+    class="tool-message"
+    role="status"
+    aria-live="polite"
+  >
+    Load a series to request actual monthly prices from Yahoo Finance. No sample
+    prices are supplied.
+  </p>
+  <div id="market-history-results" hidden>
+    <svg
+      id="market-history-chart"
+      class="index-chart"
+      viewBox="0 0 600 130"
+      role="img"
+      aria-label="Rebased asset history"
+      ><polyline
+        fill="none"
+        stroke="var(--accent)"
+        stroke-width="1.5"
+        vector-effect="non-scaling-stroke"></polyline></svg
+    ><details class="model-details">
+      <summary>Inspect available observations</summary><div
+        class="tool-table-scroll"
+      >
+        <table id="market-history-table">
+          <caption
+            >Monthly dates as supplied by the provider · current month can be
+            partial</caption
+          ><thead
+            ><tr
+              ><th scope="col">Month</th><th scope="col">Rebased value</th></tr
+            ></thead
+          ><tbody></tbody>
+        </table>
+      </div>
+    </details>
+  </div>
+</section>
+<script>
+  import { rebase } from '../../../lib/macro/market';
+  import type { Observation } from '../../../lib/macro/series';
+  const form = document.querySelector<HTMLFormElement>('#market-history-form');
+  if (form) {
+    const message = document.querySelector<HTMLElement>(
+        '#market-history-message',
+      )!,
+      results = document.querySelector<HTMLElement>('#market-history-results')!,
+      button = form.querySelector<HTMLButtonElement>('button')!;
+    let controller: AbortController | undefined;
+    form.addEventListener('change', () => {
+      controller?.abort();
+      results.hidden = true;
+      button.disabled = false;
+      message.textContent =
+        'Selection changed. Load history to update the result.';
+    });
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      controller?.abort();
+      const request = new AbortController();
+      controller = request;
+      button.disabled = true;
+      results.hidden = true;
+      message.textContent = 'Loading market history…';
+      const ticker =
+          document.querySelector<HTMLSelectElement>('#market-asset')!.value,
+        months = Number(
+          document.querySelector<HTMLSelectElement>('#market-range')!.value,
+        );
+      try {
+        const response = await fetch(
+          `/api/market-history/?ticker=${encodeURIComponent(ticker)}`,
+          { signal: request.signal },
+        );
+        const data = (await response.json()) as {
+          error?: string;
+          points?: Observation[];
+          basis?: string;
+        };
+        if (!response.ok || !data.points?.length)
+          throw new Error(data.error || 'Market history is unavailable.');
+        const cutoff = new Date();
+        cutoff.setUTCMonth(cutoff.getUTCMonth() - months);
+        const points = rebase(
+          data.points.filter(
+            (p) => p.date >= cutoff.toISOString().slice(0, 10),
+          ),
+        );
+        if (!points.length) throw new Error('No observations in this period.');
+        const values = points.map((p) => p.value),
+          min = Math.min(...values),
+          max = Math.max(...values),
+          span = max - min || 1;
+        const svg = document.querySelector<SVGElement>(
+          '#market-history-chart',
+        )!;
+        svg
+          .querySelector('polyline')!
+          .setAttribute(
+            'points',
+            points
+              .map(
+                (p, i) =>
+                  `${(i / Math.max(points.length - 1, 1)) * 600},${115 - ((p.value - min) / span) * 100}`,
+              )
+              .join(' '),
+          );
+        svg.setAttribute(
+          'aria-label',
+          `${ticker}, rebased to 100. ${points[0].date} to ${points.at(-1)!.date}. Latest ${points.at(-1)!.value.toFixed(2)}.`,
+        );
+        const tbody = document.querySelector<HTMLTableElement>(
+          '#market-history-table',
+        )!.tBodies[0];
+        tbody.replaceChildren();
+        for (const point of [...points].reverse()) {
+          const row = tbody.insertRow();
+          const date = document.createElement('th');
+          date.scope = 'row';
+          date.textContent = point.date;
+          const value = document.createElement('td');
+          value.textContent = point.value.toFixed(2);
+          row.append(date, value);
+        }
+        message.textContent = `${ticker} · ${data.basis} · ${points[0].date} to ${points.at(-1)!.date} · Latest rebased value ${points.at(-1)!.value.toFixed(2)}. Source: Yahoo Finance. Chart uses its own vertical scale.`;
+        results.hidden = false;
+      } catch (error) {
+        if (!request.signal.aborted)
+          message.textContent =
+            error instanceof Error
+              ? error.message
+              : 'Could not reach the data source.';
+      } finally {
+        if (controller === request) button.disabled = false;
+      }
+    });
+  }
+</script>

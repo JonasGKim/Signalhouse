@@ -1,0 +1,32 @@
+---
+import { newestFirst, tickerSlug, type ResearchEntry } from '../../../data/research';
+interface Props { entries: readonly ResearchEntry[]; }
+const { entries } = Astro.props;
+const days = new Map<string, ResearchEntry[]>();
+for (const entry of newestFirst(entries)) {
+  const day = entry.publishedAt.slice(0, 10);
+  days.set(day, [...(days.get(day) ?? []), entry]);
+}
+const dateLabel = (date: string) => new Date(`${date}T12:00:00Z`).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+---
+<div class="notebook">
+  {[...days].map(([day, notes]) => (
+    <section class="notebook-day" aria-label={dateLabel(day)}>
+      <h2 class="notebook-date"><time datetime={day}>{dateLabel(day)}</time></h2>
+      <div class="notebook-notes">
+        {notes.map(entry => (
+          <article class="notebook-entry">
+            <div class="notebook-labels">
+              {entry.ticker ? <a class="notebook-ticker" href={`/research/${tickerSlug(entry.ticker)}/`}>{entry.ticker}</a> : entry.company && <span>{entry.company}</span>}
+              {entry.company && entry.company.toUpperCase() !== entry.ticker && entry.ticker && <span>{entry.company}</span>}
+              {entry.categories.length > 0 && <span>{entry.categories.join(' · ')}</span>}
+            </div>
+            <a class="notebook-title" href={`/research/notes/${entry.id}/`}>{entry.thesis || entry.notes || 'Open note'}</a>
+            {entry.notes && entry.thesis && entry.notes.trim() !== entry.thesis.trim() && <p class="notebook-excerpt">{entry.notes}</p>}
+          </article>
+        ))}
+      </div>
+    </section>
+  ))}
+  {entries.length === 0 && <p class="muted">No research entries yet.</p>}
+</div>
