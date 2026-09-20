@@ -1,0 +1,22 @@
+---
+import SourceNote from '../../components/ui/SourceNote.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeading from '../../components/ui/PageHeading.astro';
+import MacroShell from '../../components/projects/hypocenter/MacroShell.astro';
+import HypocenterIndex from '../../components/projects/hypocenter/HypocenterIndex.astro';
+---
+
+<BaseLayout
+  title="Hypocenter"
+  description="Published economic observations from FRED, with source links, dates and historical context."
+  ><div class="container page-content">
+    <PageHeading
+      number="01"
+      category="Macro"
+      title="Hypocenter"
+      description="Activity, labor, prices and interest rates. A wider lens on the environment businesses operate in."
+      status="FRED observations"
+    /><HypocenterIndex /><MacroShell />
+    <SourceNote id="hypocenter" />
+  </div></BaseLayout
+>

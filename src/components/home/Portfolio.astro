@@ -216,37 +216,65 @@ const arcs = holdings.map((h) => {
         selected?.scrollIntoView({ block: 'nearest', behavior: 'instant' });
       }),
     );
-  document
-    .querySelectorAll<HTMLButtonElement>('[data-quote]')
-    .forEach((button) =>
-      button.addEventListener('click', async () => {
-        const panel = button.closest('article')!;
-        const status = panel.querySelector<HTMLElement>('[data-quote-status]')!;
-        button.disabled = true;
-        status.textContent = 'Checking the latest available market quote…';
+  const quoteButtons = Array.from(
+    document.querySelectorAll<HTMLButtonElement>('[data-quote]'),
+  );
+  const quoteRefreshInterval = 12 * 60 * 60 * 1000;
+  const quoteRefreshKey = 'signalhouse:portfolio-quotes:last-refresh';
+  const loadQuote = async (button: HTMLButtonElement) => {
+    const panel = button.closest('article')!;
+    const status = panel.querySelector<HTMLElement>('[data-quote-status]')!;
+    button.disabled = true;
+    status.textContent = 'Checking the latest available market quote…';
+    try {
+      const response = await fetch(
+        `/api/portfolio-quote/?ticker=${encodeURIComponent(button.dataset.quote!)}`,
+      );
+      const data = await response.json();
+      if (!response.ok)
+        throw new Error(
+          data.error || 'Market quotes are temporarily unavailable.',
+        );
+      panel.querySelector<HTMLElement>('[data-quote-price]')!.textContent =
+        new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: 'USD',
+        }).format(data.price);
+      status.textContent = `Alpha Vantage · Trading date ${data.date} · End-of-day quote; not real-time. Allocation remains the original snapshot.`;
+      return true;
+    } catch (error) {
+      status.textContent =
+        error instanceof Error
+          ? error.message
+          : 'Market quotes are temporarily unavailable.';
+      return false;
+    } finally {
+      button.disabled = false;
+    }
+  };
+  quoteButtons.forEach((button) =>
+    button.addEventListener('click', () => void loadQuote(button)),
+  );
+
+  let lastRefresh = 0;
+  try {
+    lastRefresh = Number(localStorage.getItem(quoteRefreshKey) ?? 0);
+  } catch {
+    lastRefresh = 0;
+  }
+  if (Date.now() - lastRefresh >= quoteRefreshInterval) {
+    void (async () => {
+      let refreshed = 0;
+      for (const button of quoteButtons) {
+        if (await loadQuote(button)) refreshed += 1;
+      }
+      if (refreshed > 0) {
         try {
-          const response = await fetch(
-            `/api/portfolio-quote/?ticker=${encodeURIComponent(button.dataset.quote!)}`,
-          );
-          const data = await response.json();
-          if (!response.ok)
-            throw new Error(
-              data.error || 'Market quotes are temporarily unavailable.',
-            );
-          panel.querySelector<HTMLElement>('[data-quote-price]')!.textContent =
-            new Intl.NumberFormat('en-US', {
-              style: 'currency',
-              currency: 'USD',
-            }).format(data.price);
-          status.textContent = `Alpha Vantage · Trading date ${data.date} · End-of-day quote; not real-time. Allocation remains the original snapshot.`;
-        } catch (error) {
-          status.textContent =
-            error instanceof Error
-              ? error.message
-              : 'Market quotes are temporarily unavailable.';
-        } finally {
-          button.disabled = false;
+          localStorage.setItem(quoteRefreshKey, String(Date.now()));
+        } catch {
+          // Private browsing may block local storage; server-side caching still applies.
         }
-      }),
-    );
+      }
+    })();
+  }
 </script>

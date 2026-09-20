@@ -1,0 +1,73 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeading from '../../components/ui/PageHeading.astro';
+import { methodology } from '../../data/methodology';
+---
+
+<BaseLayout
+  title="Methodology & sources"
+  description="What Signal House uses, what it measures, and where its limits are."
+  ><div class="container page-content">
+    <PageHeading
+      number="—"
+      category="Methods & provenance"
+      title="Show the workings"
+      description="A useful conclusion starts with an inspectable source. Here is what each workspace does—and what its current inputs can support."
+      status="Sources & limitations"
+    />
+    <nav class="method-nav" aria-label="Methodology sections">
+      {methodology.map((item) => <a href={`#${item.id}`}>{item.name} ↓</a>)}
+    </nav>
+    {
+      methodology.map((item) => (
+        <section class="method-section" id={item.id}>
+          <>
+            <header>
+              <>
+                <p class="eyebrow">{item.status}</p>
+                <h2>
+                  <a href={item.href}>{item.name}</a>
+                </h2>
+              </>
+            </header>
+            <dl>
+              <>
+                <div>
+                  <>
+                    <dt>Source</dt>
+                    <dd>{item.source}</dd>
+                  </>
+                </div>
+                <div>
+                  <>
+                    <dt>What it measures</dt>
+                    <dd>{item.measure}</dd>
+                  </>
+                </div>
+                <div>
+                  <>
+                    <dt>Limitations</dt>
+                    <dd>{item.limitations}</dd>
+                  </>
+                </div>
+                <div>
+                  <>
+                    <dt>Last updated</dt>
+                    <dd>{item.updated}</dd>
+                  </>
+                </div>
+              </>
+            </dl>
+          </>
+        </section>
+      ))
+    }
+    <div class="about-note">
+      <p class="eyebrow">Visual studies</p><p>
+        Homepage instruments are conceptual illustrations. Their movement,
+        markings and proportions do not represent financial measurements or live
+        market conditions.
+      </p>
+    </div>
+  </div></BaseLayout
+>

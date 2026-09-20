@@ -1,5 +1,7 @@
 ---
 import type { Project } from '../../data/projects';
+import Arrow from './Arrow.astro';
+import ProjectMotif from './ProjectMotif.astro';
 interface Props {
   project: Project;
 }
@@ -7,11 +9,14 @@ const { project } = Astro.props;
 ---
 
 <a class="project-row" href={project.href}>
+  <span class="project-number mono">{project.number}</span>
   <div class="project-name">
     <p class="eyebrow">{project.category}</p><h3>{project.name}</h3>
   </div>
   <div class="project-description">
     <p>{project.description}</p><span class="project-status mono"
       >{project.status}</span>
-  </div>
+  </div><ProjectMotif kind={project.id} /><span class="project-arrow">
+    <Arrow />
+  </span>
 </a>

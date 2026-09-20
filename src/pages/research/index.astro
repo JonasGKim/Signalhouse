@@ -1,0 +1,44 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ResearchDesk from '../../components/projects/nfa/ResearchDesk.astro';
+import { getResearch } from '../../lib/server/notion';
+const library = await getResearch();
+Astro.response.headers.set('Cache-Control', 'private, no-store');
+---
+
+<BaseLayout
+  title="Research Desk"
+  description="The Signal House research notebook: company observations, theses and evolving views."
+>
+  <div class="container page-content">
+    <header class="page-heading desk-heading">
+      <div class="desk-title-row">
+        <h1>Research Desk</h1>
+        <span class:list={['connection-status', { connected: library.status === 'ready' }]}>
+          <i aria-hidden="true"></i>{library.status === 'ready' ? 'Notion connected' : 'Source unavailable'}
+        </span>
+      </div>
+      <p class="page-description">Market notes and working theses, as they develop.</p>
+    </header>
+    {
+      library.status === 'ready' ? (
+        <ResearchDesk entries={library.entries} />
+      ) : (
+        <section class="source-state" role="status">
+          <>
+            <p class="eyebrow">Research connection</p>
+            <h2>The notebook is temporarily unavailable.</h2>
+            <p>
+              We couldn’t retrieve the research source. Please try again
+              shortly.
+            </p>
+            <a class="text-link" href="/research/">
+              Try again
+            </a>
+          </>
+        </section>
+      )
+    }
+    <a class="desk-methodology text-link" href="/methodology/#nfa">Research methodology</a>
+  </div>
+</BaseLayout>

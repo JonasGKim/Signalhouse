@@ -1,0 +1,35 @@
+---
+import SourceNote from '../../components/ui/SourceNote.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeading from '../../components/ui/PageHeading.astro';
+import FilingsShell from '../../components/projects/filings/FilingsShell.astro';
+---
+
+<BaseLayout
+  title="Filings"
+  description="Compare the text of company filings locally, with additions, removals and surrounding context."
+  ><div class="container page-content">
+    <PageHeading
+      number="04"
+      category="Fundamentals"
+      title="Filings"
+      status="Local comparison"
+      description="Compare disclosure language across filing periods. See additions, removals and the context around them."
+    /><FilingsShell /><div class="context-columns">
+      <section>
+        <p class="eyebrow">The original source</p><h2>
+          Go back to the filing.
+        </h2><p>
+          Find original disclosures through SEC EDGAR, then bring the same
+          section from two filing periods into the comparison.
+        </p>
+      </section><section>
+        <p class="eyebrow">Changes, in context</p><h2>Read what changed.</h2><p>
+          The comparison labels added and removed language while preserving
+          unchanged passages for context.
+        </p>
+      </section>
+    </div>
+    <SourceNote id="filings" />
+  </div></BaseLayout
+>

@@ -1,0 +1,20 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/home/Hero.astro';
+import Portfolio from '../components/home/Portfolio.astro';
+import ProjectIndex from '../components/home/ProjectIndex.astro';
+import ResearchPreview from '../components/home/ResearchPreview.astro';
+import { getResearch } from '../lib/server/notion';
+const library = await getResearch();
+Astro.response.headers.set('Cache-Control', 'private, no-store');
+---
+
+<BaseLayout
+  ><Hero
+    researchCount={library.entries.length}
+    researchAvailable={library.status === 'ready'}
+  /><Portfolio /><ResearchPreview
+    entries={library.entries}
+    available={library.status === 'ready'}
+  /><ProjectIndex /></BaseLayout
+>

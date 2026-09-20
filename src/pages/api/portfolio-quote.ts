@@ -3,6 +3,17 @@ import { getSecret } from 'astro:env/server';
 import { holdings } from '../../data/portfolio';
 const cache = new Map<string, { until: number; price: number; date: string }>();
 let retryAfter = 0;
+const CACHE_TTL = 12 * 60 * 60 * 1000;
+const DAILY_REQUEST_LIMIT = 16;
+let requestBudget = { day: '', count: 0 };
+
+const canRequest = () => {
+  const day = new Date().toISOString().slice(0, 10);
+  if (requestBudget.day !== day) requestBudget = { day, count: 0 };
+  if (requestBudget.count >= DAILY_REQUEST_LIMIT) return false;
+  requestBudget.count += 1;
+  return true;
+};
 export const GET: APIRoute = async ({ url }) => {
   const ticker = url.searchParams.get('ticker') ?? '';
   if (!holdings.some((h) => h.ticker === ticker))
@@ -29,7 +40,7 @@ export const GET: APIRoute = async ({ url }) => {
         source: 'Alpha Vantage',
         frequency: 'end-of-day',
       },
-      { headers: { 'Cache-Control': 'public, max-age=3600' } },
+      { headers: { 'Cache-Control': 'public, max-age=43200' } },
     );
   if (stored && stored.until > Date.now()) return success(stored);
   const unavailable = () =>
@@ -44,6 +55,14 @@ export const GET: APIRoute = async ({ url }) => {
       },
     );
   if (retryAfter > Date.now()) return unavailable();
+  if (!canRequest())
+    return Response.json(
+      {
+        error:
+          'The daily market-data refresh budget has been reached. Quotes will refresh again tomorrow.',
+      },
+      { status: 429, headers: { 'Cache-Control': 'no-store' } },
+    );
   try {
     const query = new URLSearchParams({
       function: 'GLOBAL_QUOTE',
@@ -67,7 +86,7 @@ export const GET: APIRoute = async ({ url }) => {
       !/^\d{4}-\d{2}-\d{2}$/.test(date)
     )
       throw new Error('Invalid quote');
-    const value = { until: Date.now() + 3600000, price, date };
+    const value = { until: Date.now() + CACHE_TTL, price, date };
     cache.set(ticker, value);
     return success(value);
   } catch {
